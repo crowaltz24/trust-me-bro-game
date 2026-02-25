@@ -1,0 +1,595 @@
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@500;600&display=swap");
+
+:root {
+  --bg: #0b0f14;
+  --ink: #e2e8f0;
+  --accent: #f59e0b;
+  --accent-dark: #b45309;
+  --accent-soft: #1f2937;
+  --muted: #94a3b8;
+  --panel: #121826;
+  --panel-strong: #0f172a;
+  --border: #263241;
+  --shadow: transparent;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "IBM Plex Sans", sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+.app {
+  height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 12px;
+  padding: 16px;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 0;
+}
+
+.topbar h1 {
+  font-size: 2rem;
+  margin: 0;
+}
+
+.subtitle {
+  margin: 4px 0 0;
+  color: var(--muted);
+}
+
+.status {
+  display: flex;
+  gap: 18px;
+  background: var(--panel);
+  padding: 12px 16px;
+  border-radius: 0;
+  border: 1px solid var(--border);
+  box-shadow: none;
+}
+
+.status div {
+  display: grid;
+  gap: 4px;
+  font-size: 0.9rem;
+}
+
+.status strong {
+  font-size: 1.1rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 2.2fr 1fr;
+  gap: 20px;
+  min-height: 0;
+  height: 100%;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  padding: 14px;
+  box-shadow: none;
+}
+
+.main-panel {
+  display: grid;
+  gap: 18px;
+  min-height: 0;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tabs {
+  display: flex;
+  gap: 10px;
+}
+
+.tab {
+  border: 1px solid var(--border);
+  background: #0b0f14;
+  padding: 8px 16px;
+  border-radius: 0;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--ink);
+}
+
+.tab.active {
+  background: var(--accent);
+  color: #0b0f14;
+  border-color: var(--accent-dark);
+}
+
+.controls button,
+.trade-actions button,
+.chat-actions button,
+.feed-header button {
+  background: var(--accent);
+  border: none;
+  color: #0b0f14;
+  padding: 8px 14px;
+  border-radius: 0;
+  cursor: pointer;
+  font-weight: 600;
+  transition: none;
+}
+
+.controls button:hover,
+.trade-actions button:hover,
+.chat-actions button:hover,
+.feed-header button:hover {
+  filter: brightness(1.05);
+}
+
+button.secondary {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+}
+
+.chart-wrap {
+  background: repeating-linear-gradient(0deg, #0f172a 0, #0f172a 22px, #131c2b 22px, #131c2b 23px);
+  border-radius: 0;
+  padding: 12px;
+  border: 1px solid var(--border);
+}
+
+#price-chart {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: #0b0f14;
+  border: 1px solid var(--border);
+}
+
+.chart-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.chart-meta h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-family: "IBM Plex Mono", monospace;
+}
+
+.price-info {
+  display: flex;
+  gap: 16px;
+  font-size: 0.9rem;
+  font-family: "IBM Plex Mono", monospace;
+}
+
+.price-info strong {
+  font-size: 1.1rem;
+}
+
+.trade-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 16px;
+  min-height: 0;
+}
+
+.sub-panel {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-height: 0;
+}
+
+.panel-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.sub-panel h3 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.trade-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+label {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 12px;
+  font-size: 0.9rem;
+}
+
+input,
+select {
+  padding: 8px 10px;
+  border-radius: 0;
+  border: 1px solid var(--border);
+  font-family: inherit;
+  background: #0b0f14;
+  color: var(--ink);
+}
+
+.portfolio {
+  display: grid;
+  gap: 10px;
+  font-size: 0.9rem;
+  overflow-y: auto;
+  min-height: 0;
+  scrollbar-color: var(--border) #0b0f14;
+  scrollbar-width: thin;
+}
+
+.portfolio .row {
+  display: grid;
+  gap: 8px;
+  background: var(--panel-strong);
+  padding: 8px 10px;
+  border-radius: 0;
+  border: 1px solid var(--border);
+}
+
+.row-main {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.85rem;
+}
+
+
+.row-actions {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 6px;
+}
+
+.row-actions input {
+  padding: 6px 8px;
+}
+
+.row-slider {
+  width: 100%;
+}
+
+.row-amount-value {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.85rem;
+  color: var(--muted);
+  align-self: center;
+}
+
+.row-exec {
+  background: var(--accent);
+  border: none;
+  color: #0b0f14;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.phone {
+  display: grid;
+  place-items: start;
+}
+
+.phone-shell {
+  width: 100%;
+  max-width: 340px;
+  height: clamp(520px, 70vh, 620px);
+  background: #0a0f16;
+  border: 3px solid #1f2937;
+  box-shadow: none;
+  position: relative;
+  display: grid;
+  grid-template-rows: 22px 1fr;
+}
+
+.phone-top {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.phone-speaker {
+  width: 60px;
+  height: 4px;
+  background: #1f2937;
+}
+
+.phone-camera {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #1f2937;
+}
+
+.phone-screen {
+  background: #0b1220;
+  border-top: 1px solid #1f2937;
+  padding: 10px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+.phone-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.phone-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.phone-tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.phone-settings {
+  position: absolute;
+  top: 50px;
+  right: 10px;
+  width: 220px;
+  background: #0b0f14;
+  border: 1px solid var(--border);
+  padding: 10px;
+  display: none;
+  grid-template-rows: auto 1fr;
+  gap: 10px;
+  z-index: 5;
+}
+
+.phone-settings.active {
+  display: grid;
+}
+
+.phone-settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#settings-reset {
+  background: var(--accent);
+  border: none;
+  color: #0b0f14;
+  padding: 8px 10px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.phone-tab {
+  border: 1px solid var(--border);
+  background: var(--panel-strong);
+  padding: 6px 12px;
+  border-radius: 0;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--ink);
+}
+
+.phone-tab.active {
+  background: var(--accent);
+  color: #0b0f14;
+  border-color: var(--accent-dark);
+}
+
+.phone-body {
+  display: grid;
+  height: 100%;
+  overflow: hidden;
+}
+
+.phone-footer.status {
+  background: #0b0f14;
+  border: 1px solid var(--border);
+  padding: 6px 8px;
+  justify-content: space-between;
+}
+
+.phone-footer.status div {
+  font-size: 0.75rem;
+}
+
+.phone-footer.status strong {
+  font-size: 0.9rem;
+}
+
+.phone-panel {
+  display: none;
+  grid-template-rows: auto 1fr auto;
+  gap: 12px;
+  height: 100%;
+  overflow: hidden;
+}
+
+.phone-panel.active {
+  display: grid;
+}
+
+.phone-panel#phone-social {
+  grid-template-rows: auto 1fr;
+}
+
+.phone-control {
+  margin-bottom: 4px;
+}
+
+.chat {
+  min-height: 0;
+  height: 100%;
+  overflow-y: auto;
+  display: grid;
+  gap: 10px;
+  padding: 10px;
+  background: #0b0f14;
+  border-radius: 0;
+  border: 1px solid var(--border);
+  scrollbar-color: var(--border) #0b0f14;
+  scrollbar-width: thin;
+}
+
+.chat .msg {
+  padding: 8px 10px;
+  border-radius: 0;
+  background: #111827;
+  border: 1px solid var(--border);
+  font-size: 0.9rem;
+  word-break: break-word;
+}
+
+.feed-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.feed-body {
+  display: grid;
+  gap: 10px;
+  overflow-y: auto;
+  height: 100%;
+  padding-right: 6px;
+  scrollbar-color: var(--border) #0b0f14;
+  scrollbar-width: thin;
+}
+
+.chat-list-view,
+.chat-thread-view {
+  display: none;
+  grid-template-rows: auto 1fr;
+  gap: 12px;
+  height: 100%;
+  overflow: hidden;
+}
+
+.chat-list-view.active,
+.chat-thread-view.active {
+  display: grid;
+}
+
+.chat-list {
+  display: grid;
+  gap: 8px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  background: #0b0f14;
+  padding: 8px;
+  scrollbar-color: var(--border) #0b0f14;
+  scrollbar-width: thin;
+}
+
+.portfolio::-webkit-scrollbar,
+.chat::-webkit-scrollbar,
+.feed-body::-webkit-scrollbar,
+.chat-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.portfolio::-webkit-scrollbar-track,
+.chat::-webkit-scrollbar-track,
+.feed-body::-webkit-scrollbar-track,
+.chat-list::-webkit-scrollbar-track {
+  background: #0b0f14;
+}
+
+.portfolio::-webkit-scrollbar-thumb,
+.chat::-webkit-scrollbar-thumb,
+.feed-body::-webkit-scrollbar-thumb,
+.chat-list::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 0;
+}
+
+.contact-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+  background: var(--panel-strong);
+  border: 1px solid var(--border);
+  padding: 8px 10px;
+  cursor: pointer;
+  color: var(--ink);
+}
+
+.contact-meta {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.contact-badge {
+  background: var(--accent);
+  color: #0b0f14;
+  font-size: 0.75rem;
+  padding: 2px 6px;
+  border-radius: 0;
+}
+
+.chat-thread-header {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  align-items: center;
+}
+
+.feed-item {
+  background: var(--panel-strong);
+  border-radius: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  font-size: 0.85rem;
+}
+
+.feed-item.pending {
+  border-left: 3px solid var(--accent);
+  opacity: 0.85;
+}
+
+@media (max-width: 960px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .trade-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
