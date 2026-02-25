@@ -343,7 +343,8 @@ function scheduleChatPulse() {
     const eligible = characters.filter((item) => item.id !== "babe");
     const character = eligible[Math.floor(market.rng() * eligible.length)];
     const advice = getAdvice(character, market, market.rng);
-    addChatMessage(`${character.name}: ${advice.text}`, character.id);
+    const tag = advice.isScheme ? "[SCHEME]" : "[LEGIT]";
+    addChatMessage(`${character.name} ${tag}: ${advice.text}`, character.id);
     latestAdviceByContact.set(character.id, advice);
     if (activeContactId === character.id) {
       ui.followBtn.disabled = false;
