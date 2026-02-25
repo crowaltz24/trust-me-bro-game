@@ -92,6 +92,13 @@ export function createMarket(seed) {
     history: [],
   }));
 
+  const decaySentiment = (asset) => {
+    const magnitude = Math.abs(asset.sentiment);
+    const extraDecay = Math.min(0.02, magnitude * 0.08);
+    const factor = Math.max(0.94, 0.985 - extraDecay);
+    asset.sentiment *= factor;
+  };
+
   assets.forEach((asset) => {
     let price = asset.price;
     for (let i = 0; i < 60; i += 1) {
@@ -100,7 +107,7 @@ export function createMarket(seed) {
       const drift = asset.drift + sentimentPush;
       const change = drift + noise;
       price = Math.max(0.05, price * (1 + change));
-      asset.sentiment *= 0.985;
+      decaySentiment(asset);
       asset.history.push(price);
     }
     asset.price = price;
@@ -114,6 +121,13 @@ export function createMarket(seed) {
 }
 
 export function tickMarket(market) {
+  const decaySentiment = (asset) => {
+    const magnitude = Math.abs(asset.sentiment);
+    const extraDecay = Math.min(0.02, magnitude * 0.08);
+    const factor = Math.max(0.94, 0.985 - extraDecay);
+    asset.sentiment *= factor;
+  };
+
   market.assets.forEach((asset) => {
     const sentimentPush = asset.sentiment * 0.003;
     const noise = (market.rng() - 0.5) * asset.volatility;
@@ -122,7 +136,7 @@ export function tickMarket(market) {
     const nextPrice = Math.max(0.05, asset.price * (1 + change));
 
     asset.price = nextPrice;
-    asset.sentiment *= 0.985;
+    decaySentiment(asset);
 
     asset.history.push(nextPrice);
     if (asset.history.length > 120) {
