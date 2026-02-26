@@ -11,7 +11,7 @@ Built for Hawk-a-thoon '26. Currently password locked to limit API usage.
 
 ## How to Play
 
-When you start a new game, you'll be greeted with your desktop showing a graph showing asset trajectory, a trade window, and your portfolio. Additionally, to the right, you'll find your phone, showing you your chat contacts and feed.
+When you start a new game, you'll be greeted with your desktop displaying a graph showing asset trajectory, a trade window, and your portfolio. Additionally, to the right, you'll find your phone, showing you your chat contacts and feed.
 
 ### Desktop
 ![desktop layout picture](assets/desktop.png)
