@@ -534,7 +534,9 @@ function closeDayModal() {
 function applyPauseState() {
   const isPaused = Boolean(state.isPaused);
   ui.buyBtn.disabled = isPaused;
-  ui.sellBtn.disabled = isPaused;
+  if (ui.sellBtn) {
+    ui.sellBtn.disabled = isPaused;
+  }
   ui.pauseBtn.textContent = isPaused ? "Resume" : "Pause";
 }
 
@@ -815,21 +817,23 @@ function init() {
     updateHud();
   });
 
-  ui.sellBtn.addEventListener("click", () => {
-    const asset = getAssetById(market, ui.assetSelect.value);
-    const amount = Number(ui.tradeAmount.value) || 1;
-    const pnl = computeSellPnl(asset, amount);
-    const result = sellAsset(portfolio, asset, amount);
-    addChatMessage(`System: ${result.message}`);
-    if (result.ok && pnl != null) {
-      if (pnl > 0) {
-        playSfx(sellProfitSfx);
-      } else if (pnl < 0) {
-        playSfx(sellLossSfx);
+  if (ui.sellBtn) {
+    ui.sellBtn.addEventListener("click", () => {
+      const asset = getAssetById(market, ui.assetSelect.value);
+      const amount = Number(ui.tradeAmount.value) || 1;
+      const pnl = computeSellPnl(asset, amount);
+      const result = sellAsset(portfolio, asset, amount);
+      addChatMessage(`System: ${result.message}`);
+      if (result.ok && pnl != null) {
+        if (pnl > 0) {
+          playSfx(sellProfitSfx);
+        } else if (pnl < 0) {
+          playSfx(sellLossSfx);
+        }
       }
-    }
-    updateHud();
-  });
+      updateHud();
+    });
+  }
 
   ui.portfolioList.addEventListener("input", (event) => {
     const slider = event.target.closest(".row-slider");
