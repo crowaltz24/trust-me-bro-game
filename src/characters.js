@@ -4,8 +4,8 @@ const CHARACTERS = [
     name: "Crypto Bro",
     style: "exit liquidity enthusiast",
     persona: "Hype-chasing obnoxious crypto gambler who talks fast, flexes wins, and leans on buzzwords. Spams emojis like 🚀📈💎",
-    schemeChance: 0.45,
-    impact: 0.18,
+    schemeChance: 0.4,
+    impact: 0.25,
   },
   {
     id: "guru",
@@ -13,31 +13,31 @@ const CHARACTERS = [
     style: "it's actually very simple",
     persona: "Macro commentator who frames everything as a big-picture narrative and causal chain.",
     schemeChance: 0.6,
-    impact: 0.16,
+    impact: 0.18,
   },
   {
     id: "yoga",
     name: "Yoga Instructor",
     style: "i feel it in my chakras",
     persona: "New age coach who speaks in vibes, intuition, and calm encouragement.",
-    schemeChance: 0.35,
-    impact: 0.2,
+    schemeChance: 0.8,
+    impact: 0.12,
   },
   {
     id: "skeptic",
     name: "Skeptic Analyst",
     style: "akshually ☝️🤓",
     persona: "Pedantic analyst who nitpicks, cites caveats, and hates sloppy reasoning.",
-    schemeChance: 0.2,
-    impact: 0.12,
+    schemeChance: 0.3,
+    impact: 0.3,
   },
   {
     id: "insider",
     name: "Insider Uncle",
     style: "can't say how i know",
     persona: "Older networking type who hints at insider info and speaks in coy fragments.",
-    schemeChance: 0.7,
-    impact: 0.25,
+    schemeChance: 0.38,
+    impact: 0.45,
   },
   {
     id: "babe",
@@ -113,6 +113,6 @@ export function getAdvice(character, market, rng) {
 export function buildAdvicePrompt(character, advice) {
   const truthStatus = advice.isScheme ? "scheme" : "legit";
   const system = `You are ${character.name}, a contact in a finance meme chat. Persona: ${character.persona}. Stay in character. Write a short sentence as a text message. ALWAYS mention by name what stock you're talking about. Never mention being an AI or that this is a game. Do not say "scheme" or "legit". Do not give actual financial advice. Do not tell the user to do their own research.`;
-  const user = `Your true intent: Convince the person you're talking with to ${advice.intent} a stock/coin named "${advice.assetId}". Truth status: ${truthStatus}. If truth status is scheme, sound pushy with some clear red flags. If truth status is legit, sound grounded with a simple concrete reason. Keep it subtle and natural.`;
+  const user = `Your true intent: Convince the person you're talking with to ${advice.intent} a stock/coin named "${advice.assetId}". Truth status: ${truthStatus}. If truth status is scheme, sound very pushy with obvious red flags. If truth status is legit, sound grounded with a simple concrete reason. Keep it subtle and natural.`;
   return { system, user };
 }
