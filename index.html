@@ -127,7 +127,6 @@
       });
 
       newBtn.addEventListener("click", () => {
-        playEnterSfx();
         const shouldPlayIntro = !localStorage.getItem(INTRO_SEEN_KEY);
         sessionStorage.setItem(AUTH_KEY, "1");
         sessionStorage.setItem(START_MODE_KEY, "new");
