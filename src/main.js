@@ -538,7 +538,10 @@ function scheduleFeedPulse() {
 }
 
 function scheduleChatPulse() {
-  const delay = 8000 + Math.floor(market.rng() * 12000);
+  const baseDelay = 8000 + Math.floor(market.rng() * 12000);
+  const dayProgress = state.daySeconds > 0 ? state.elapsedToday / state.daySeconds : 0;
+  const multiplier = dayProgress >= 0.5 ? 0.6 : 1;
+  const delay = Math.floor(baseDelay * multiplier);
   chatTimer = setTimeout(async () => {
     const eligible = characters.filter((item) => item.id !== "babe");
     const character = eligible[Math.floor(market.rng() * eligible.length)];
