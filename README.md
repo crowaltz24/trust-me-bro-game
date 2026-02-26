@@ -3,7 +3,7 @@
 
 ---
 
-**Trust Me Bro** is a (bad) stock market simulator where no one is your friend.
+**Trust Me Bro** is a (bad) stock market simulation game where no one is your friend.
 
 Your girlfriend just left you because you don't make enough money -- time to go for broke and win her back! Trade stocks and crypto, keep up with social media and news, and try to figure out if your contacts are giving you good advice or pulling a fast one on you. 
 
