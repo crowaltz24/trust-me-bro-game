@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@500;600&family=Space+Grotesk:wght@500;700&family=Syne:wght@600;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@500;600&display=swap");
 
 :root {
   --bg: #0b0f14;
@@ -27,56 +27,47 @@ body {
 }
 
 body.landing {
-  background: radial-gradient(circle at top right, #3b2d1f 0%, #0b0f14 55%, #070a10 100%);
+  background: var(--bg);
   overflow-x: hidden;
 }
 
 .landing-bg {
-  position: fixed;
-  inset: 0;
-  background:
-    radial-gradient(circle at 20% 20%, rgba(245, 158, 11, 0.2), transparent 40%),
-    radial-gradient(circle at 80% 10%, rgba(34, 197, 94, 0.18), transparent 35%),
-    radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.12), transparent 35%);
-  pointer-events: none;
-  z-index: 0;
+  display: none;
 }
 
 .landing-hero {
   min-height: 100vh;
   display: grid;
   place-items: center;
-  padding: 48px 24px;
+  padding: 32px 20px;
   position: relative;
   z-index: 1;
 }
 
 .landing-wrap {
-  width: min(1100px, 100%);
+  width: min(980px, 100%);
   display: grid;
-  grid-template-columns: minmax(280px, 1.1fr) minmax(280px, 0.9fr);
-  gap: 40px;
+  grid-template-columns: minmax(260px, 1fr) minmax(260px, 0.9fr);
+  gap: 28px;
   align-items: center;
 }
 
 .landing-copy h1 {
-  font-family: "Syne", sans-serif;
-  font-size: clamp(2.6rem, 3.8vw, 4.2rem);
-  letter-spacing: 0.02em;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: clamp(2.2rem, 3vw, 3.4rem);
   margin: 0 0 12px;
 }
 
 .landing-kicker {
-  font-family: "Space Grotesk", sans-serif;
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  color: rgba(226, 232, 240, 0.6);
-  font-size: 0.75rem;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--muted);
+  font-size: 0.85rem;
   margin-bottom: 12px;
 }
 
 .landing-tagline {
-  font-size: 1.2rem;
+  font-size: 1.05rem;
   max-width: 420px;
   margin: 0 0 28px;
   color: var(--muted);
@@ -89,7 +80,7 @@ body.landing {
 }
 
 .landing-details div {
-  background: rgba(15, 23, 42, 0.8);
+  background: var(--panel);
   border: 1px solid var(--border);
   padding: 10px 12px;
   display: grid;
@@ -111,8 +102,8 @@ body.landing {
 .landing-phone .phone-shell {
   max-width: 360px;
   height: clamp(520px, 70vh, 640px);
-  border-color: #2a3647;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  border-color: var(--border);
+  box-shadow: none;
 }
 
 .landing-screen {
@@ -125,8 +116,8 @@ body.landing {
 
 .landing-screen-header h2 {
   margin: 8px 0 6px;
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 1.4rem;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 1.2rem;
 }
 
 .landing-screen-header p {
@@ -139,13 +130,13 @@ body.landing {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.7rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0;
+  text-transform: none;
   background: #0b0f14;
   border: 1px solid var(--border);
   padding: 4px 8px;
-  color: var(--accent);
+  color: var(--muted);
 }
 
 .landing-form {
@@ -174,12 +165,11 @@ body.landing {
   padding: 10px 14px;
   font-weight: 700;
   cursor: pointer;
-  transition: transform 0.2s ease, filter 0.2s ease;
+  transition: filter 0.2s ease;
 }
 
 .landing-form button:hover {
   filter: brightness(1.05);
-  transform: translateY(-1px);
 }
 
 .landing-message {
