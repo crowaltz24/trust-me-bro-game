@@ -108,6 +108,16 @@
                   <h4>Settings</h4>
                   <button id="settings-close" class="secondary">Close</button>
                 </div>
+                <div class="settings-options">
+                  <label class="settings-option">
+                    <input id="mute-sfx" type="checkbox" />
+                    <span>Mute SFX</span>
+                  </label>
+                  <label class="settings-option">
+                    <input id="mute-chat" type="checkbox" />
+                    <span>Mute chat pings</span>
+                  </label>
+                </div>
                 <button id="settings-menu" class="secondary">Main Menu</button>
                 <button id="settings-reset">Reset Run</button>
               </div>
@@ -160,8 +170,8 @@
 
     <div class="day-modal" id="day-modal" aria-hidden="true">
       <div class="day-card" role="dialog" aria-modal="true" aria-labelledby="day-modal-title">
-        <p>Day complete.</p>
-        <!-- <h2 id="day-modal-title">Begin day 2</h2> -->
+        <p id="day-summary"></p>
+        <h2 id="day-modal-title">Begin day 2</h2>
         <button type="button" id="day-start-btn">Begin day 2</button>
       </div>
     </div>

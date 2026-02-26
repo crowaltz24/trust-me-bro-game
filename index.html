@@ -68,7 +68,7 @@
                 <div class="landing-cutscene" id="landing-cutscene">
                   <div class="landing-cutscene-header">Babe &lt;3</div>
                   <div class="chat landing-chat" id="landing-chat"></div>
-                  <button type="button" id="landing-cutscene-continue">Continue</button>
+                  <button type="button" id="landing-cutscene-continue">Lock In</button>
                   <p class="landing-message" id="landing-cutscene-message" role="status"></p>
                 </div>
               </div>
@@ -97,6 +97,18 @@
       const AUTH_KEY = "meme-market-auth";
       const ping = new Audio("/assets/notification.mp3");
       ping.volume = 0.55;
+      const enterSfx = new Audio("/assets/oioioi.mp3");
+      enterSfx.volume = 0.65;
+
+      const playEnterSfx = () => {
+        try {
+          const sound = enterSfx.cloneNode(true);
+          sound.volume = enterSfx.volume;
+          sound.play();
+        } catch (error) {
+          // Ignore autoplay failures.
+        }
+      };
 
       const showStartOptions = () => {
         form.classList.add("is-hidden");
@@ -108,12 +120,14 @@
       };
 
       continueBtn.addEventListener("click", () => {
+        playEnterSfx();
         sessionStorage.setItem(AUTH_KEY, "1");
         sessionStorage.setItem(START_MODE_KEY, "continue");
         window.location.href = "/game.html";
       });
 
       newBtn.addEventListener("click", () => {
+        playEnterSfx();
         const shouldPlayIntro = !localStorage.getItem(INTRO_SEEN_KEY);
         sessionStorage.setItem(AUTH_KEY, "1");
         sessionStorage.setItem(START_MODE_KEY, "new");
@@ -176,6 +190,7 @@
       };
 
       cutsceneContinue.addEventListener("click", () => {
+        playEnterSfx();
         sessionStorage.setItem(AUTH_KEY, "1");
         window.location.href = "/game.html";
       });
@@ -213,7 +228,7 @@
 
           throw new Error("Invalid password");
         } catch (error) {
-          // showStartOptions();
+          showStartOptions();
           message.textContent = "Nope. Try again.";
           message.dataset.status = "error";
           form.classList.remove("shake");

@@ -27,6 +27,8 @@ const ui = {
   settingsClose: document.getElementById("settings-close"),
   settingsMenu: document.getElementById("settings-menu"),
   settingsReset: document.getElementById("settings-reset"),
+  muteSfx: document.getElementById("mute-sfx"),
+  muteChat: document.getElementById("mute-chat"),
   tabs: document.querySelectorAll(".tab"),
   chart: document.getElementById("price-chart"),
   activeAsset: document.getElementById("active-asset"),
@@ -56,6 +58,7 @@ const ui = {
   refreshFeed: document.getElementById("refresh-feed"),
   toastStack: document.getElementById("toast-stack"),
   dayModal: document.getElementById("day-modal"),
+  daySummary: document.getElementById("day-summary"),
   dayModalTitle: document.getElementById("day-modal-title"),
   dayStartBtn: document.getElementById("day-start-btn"),
 };
@@ -90,8 +93,17 @@ let feedCounter = 0;
 let feedVisibleCount = 0;
 let chatTimer = null;
 let feedTimer = null;
+let dayStartNetWorth = null;
 const chatPing = new Audio("/assets/notification.mp3");
 chatPing.volume = 0.55;
+const sellProfitSfx = new Audio("/assets/gta.mp3");
+sellProfitSfx.volume = 0.6;
+const sellLossSfx = new Audio("/assets/fahh.mp3");
+sellLossSfx.volume = 0.6;
+const newDaySfx = new Audio("/assets/oioioi.mp3");
+newDaySfx.volume = 0.65;
+let audioUnlocked = false;
+let pendingLoadSfx = false;
 
 function setActiveTab(tab) {
   state.activeTab = tab;
@@ -281,6 +293,9 @@ function shouldPlayPing(text) {
 }
 
 function playChatPing() {
+  if (state.chatMuted) {
+    return;
+  }
   try {
     const sound = chatPing.cloneNode(true);
     sound.volume = chatPing.volume;
@@ -288,6 +303,64 @@ function playChatPing() {
   } catch (error) {
     // Ignore autoplay failures.
   }
+}
+
+function playSfx(audio) {
+  if (state.sfxMuted || !audio) {
+    return;
+  }
+  try {
+    const sound = audio.cloneNode(true);
+    sound.volume = audio.volume;
+    sound.play();
+  } catch (error) {
+    // Ignore autoplay failures.
+  }
+}
+
+function unlockAudio() {
+  if (audioUnlocked) {
+    return;
+  }
+  audioUnlocked = true;
+  [chatPing, sellProfitSfx, sellLossSfx, newDaySfx].forEach((audio) => {
+    try {
+      audio.muted = true;
+      const playResult = audio.play();
+      if (playResult && typeof playResult.then === "function") {
+        playResult
+          .then(() => {
+            audio.pause();
+            audio.currentTime = 0;
+            audio.muted = false;
+          })
+          .catch(() => {
+            audio.muted = false;
+          });
+      } else {
+        audio.pause();
+        audio.currentTime = 0;
+        audio.muted = false;
+      }
+    } catch (error) {
+      audio.muted = false;
+    }
+  });
+
+  if (pendingLoadSfx) {
+    playSfx(newDaySfx);
+    pendingLoadSfx = false;
+  }
+}
+
+function computeSellPnl(asset, amount) {
+  const position = portfolio.positions[asset.id];
+  if (!position || position.amount < amount) {
+    return null;
+  }
+  const gross = (asset.price - position.avgPrice) * amount;
+  const fee = asset.price * amount * portfolio.feeRate;
+  return gross - fee;
 }
 
 function renderContacts() {
@@ -443,9 +516,9 @@ function openDayModal(dayNumber) {
   if (!ui.dayModal) {
     return;
   }
-  const label = `Begin day ${dayNumber}`;
-  ui.dayModalTitle.textContent = label;
-  ui.dayStartBtn.textContent = label;
+  const completedDay = Math.max(1, dayNumber - 1);
+  ui.dayModalTitle.textContent = `Day ${completedDay} complete`;
+  ui.dayStartBtn.textContent = `Begin day ${dayNumber}`;
   ui.dayModal.classList.add("active");
   ui.dayModal.setAttribute("aria-hidden", "false");
 }
@@ -592,7 +665,15 @@ function followAdvice() {
   const amount = Number(ui.tradeAmount.value) || 1;
   let result = null;
   if (advice.intent === "sell" || advice.intent === "short") {
+    const pnl = computeSellPnl(asset, amount);
     result = sellAsset(portfolio, asset, amount);
+    if (result.ok && pnl != null) {
+      if (pnl > 0) {
+        playSfx(sellProfitSfx);
+      } else if (pnl < 0) {
+        playSfx(sellLossSfx);
+      }
+    }
   } else {
     result = buyAsset(portfolio, asset, amount);
   }
@@ -611,6 +692,31 @@ function updateHud() {
   ui.cashBalance.textContent = formatMoney(portfolio.cash);
   renderPortfolio();
   updateActiveAsset(state.activeAssetId);
+}
+
+function getNetWorth() {
+  const holdings = portfolioSnapshot(portfolio, market.assets);
+  const holdingsValue = holdings.reduce((sum, position) => sum + position.value, 0);
+  return portfolio.cash + holdingsValue;
+}
+
+function formatDaySummary(delta) {
+  if (delta > 0) {
+    return `Profit: +${formatMoney(delta)} today.`;
+  }
+  if (delta < 0) {
+    return `Loss: ${formatMoney(delta)} today.`;
+  }
+  return `Flat day: ${formatMoney(0)}.`;
+}
+
+function syncSettingsToggles() {
+  if (ui.muteSfx) {
+    ui.muteSfx.checked = Boolean(state.sfxMuted);
+  }
+  if (ui.muteChat) {
+    ui.muteChat.checked = Boolean(state.chatMuted);
+  }
 }
 
 function buildRunSnapshot() {
@@ -636,6 +742,14 @@ function tick() {
     state.elapsedToday = 0;
     state.dayCount += 1;
     applyDailyExpense(portfolio);
+    const currentNetWorth = getNetWorth();
+    const startNetWorth = dayStartNetWorth ?? currentNetWorth;
+    const dayDelta = currentNetWorth - startNetWorth;
+    if (ui.daySummary) {
+      ui.daySummary.textContent = formatDaySummary(dayDelta);
+      applyPnlClass(ui.daySummary, dayDelta);
+    }
+    dayStartNetWorth = currentNetWorth;
     addChatMessage(`System: Daily expenses charged $${portfolio.dailyExpense}.`);
     saveRun(buildRunSnapshot());
     showToast("Game saved!");
@@ -649,6 +763,9 @@ function tick() {
 }
 
 function init() {
+  window.addEventListener("pointerdown", unlockAudio, { once: true });
+  window.addEventListener("keydown", unlockAudio, { once: true });
+  dayStartNetWorth = getNetWorth();
   seedBabeChat();
   renderContacts();
   setActiveTab(state.activeTab);
@@ -658,6 +775,12 @@ function init() {
   ui.followBtn.style.visibility = "hidden";
   updateHud();
   applyPauseState();
+  syncSettingsToggles();
+  if (audioUnlocked) {
+    playSfx(newDaySfx);
+  } else {
+    pendingLoadSfx = true;
+  }
   seedFeed();
   scheduleFeedPulse();
   scheduleChatPulse();
@@ -695,8 +818,16 @@ function init() {
   ui.sellBtn.addEventListener("click", () => {
     const asset = getAssetById(market, ui.assetSelect.value);
     const amount = Number(ui.tradeAmount.value) || 1;
+    const pnl = computeSellPnl(asset, amount);
     const result = sellAsset(portfolio, asset, amount);
     addChatMessage(`System: ${result.message}`);
+    if (result.ok && pnl != null) {
+      if (pnl > 0) {
+        playSfx(sellProfitSfx);
+      } else if (pnl < 0) {
+        playSfx(sellLossSfx);
+      }
+    }
     updateHud();
   });
 
@@ -724,8 +855,16 @@ function init() {
     if (!asset) {
       return;
     }
+    const pnl = computeSellPnl(asset, amount);
     const result = sellAsset(portfolio, asset, amount);
     addChatMessage(`System: ${result.message}`);
+    if (result.ok && pnl != null) {
+      if (pnl > 0) {
+        playSfx(sellProfitSfx);
+      } else if (pnl < 0) {
+        playSfx(sellLossSfx);
+      }
+    }
     updateHud();
   });
 
@@ -746,6 +885,8 @@ function init() {
       state.isPaused = false;
       applyPauseState();
       updateHud();
+      dayStartNetWorth = getNetWorth();
+      playSfx(newDaySfx);
     });
   }
 
@@ -779,6 +920,8 @@ function init() {
     scheduleChatPulse();
     updateHud();
     applyPauseState();
+    syncSettingsToggles();
+    dayStartNetWorth = getNetWorth();
   };
 
   ui.settingsBtn.addEventListener("click", () => {
@@ -802,6 +945,20 @@ function init() {
     ui.settingsPanel.classList.remove("active");
     resetRun();
   });
+
+  if (ui.muteSfx) {
+    ui.muteSfx.addEventListener("change", () => {
+      state.sfxMuted = ui.muteSfx.checked;
+      saveState({ ...state, cash: portfolio.cash });
+    });
+  }
+
+  if (ui.muteChat) {
+    ui.muteChat.addEventListener("change", () => {
+      state.chatMuted = ui.muteChat.checked;
+      saveState({ ...state, cash: portfolio.cash });
+    });
+  }
 
   tickHandle = setInterval(tick, state.tickMs);
 }

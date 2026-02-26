@@ -11,6 +11,8 @@ export const DEFAULT_STATE = {
   seed: 452199,
   activeTab: "stocks",
   activeAssetId: "EPSN",
+  sfxMuted: false,
+  chatMuted: false,
 };
 
 export function loadState() {
