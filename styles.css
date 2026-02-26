@@ -322,6 +322,7 @@ select {
 .phone {
   display: grid;
   place-items: start;
+  gap: 12px;
 }
 
 .phone-shell {
@@ -334,6 +335,29 @@ select {
   position: relative;
   display: grid;
   grid-template-rows: 22px 1fr;
+}
+
+.toast-stack {
+  width: 100%;
+  max-width: 340px;
+  display: grid;
+  gap: 8px;
+}
+
+.toast {
+  width: 100%;
+  background: var(--panel-strong);
+  border: 1px solid var(--border);
+  padding: 8px 10px;
+  font-size: 0.8rem;
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.toast-hide {
+  opacity: 0;
+  transform: translateY(6px);
 }
 
 .phone-top {

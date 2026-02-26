@@ -45,6 +45,7 @@ const ui = {
   followBtn: document.getElementById("follow-btn"),
   feedList: document.getElementById("feed-list"),
   refreshFeed: document.getElementById("refresh-feed"),
+  toastStack: document.getElementById("toast-stack"),
 };
 
 let state = loadState();
@@ -289,6 +290,10 @@ function setActiveContact(contactId) {
 }
 
 function addChatMessage(text, contactId = activeContactId) {
+  if (text.startsWith("System:")) {
+    showToast(text.replace(/^System:\s*/, ""));
+    return;
+  }
   if (!contactId) {
     return;
   }
@@ -301,6 +306,32 @@ function addChatMessage(text, contactId = activeContactId) {
     return;
   }
   renderChat(contactId);
+}
+
+function showToast(message) {
+  if (!ui.toastStack || !message) {
+    return;
+  }
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.textContent = message;
+  ui.toastStack.appendChild(toast);
+  while (ui.toastStack.children.length > 3) {
+    ui.toastStack.removeChild(ui.toastStack.firstChild);
+  }
+  setTimeout(() => {
+    toast.classList.add("toast-hide");
+    setTimeout(() => {
+      toast.remove();
+    }, 250);
+  }, 3200);
+}
+
+function applyPauseState() {
+  const isPaused = Boolean(state.isPaused);
+  ui.buyBtn.disabled = isPaused;
+  ui.sellBtn.disabled = isPaused;
+  ui.pauseBtn.textContent = isPaused ? "Resume" : "Pause";
 }
 
 function renderFeed() {
@@ -456,6 +487,7 @@ function init() {
   ui.followBtn.disabled = true;
   ui.followBtn.style.visibility = "hidden";
   updateHud();
+  applyPauseState();
   seedFeed();
   scheduleFeedPulse();
   scheduleChatPulse();
@@ -533,7 +565,7 @@ function init() {
 
   ui.pauseBtn.addEventListener("click", () => {
     state.isPaused = !state.isPaused;
-    ui.pauseBtn.textContent = state.isPaused ? "Resume" : "Pause";
+    applyPauseState();
   });
 
   const resetRun = () => {
@@ -564,6 +596,7 @@ function init() {
     scheduleFeedPulse();
     scheduleChatPulse();
     updateHud();
+    applyPauseState();
   };
 
   ui.settingsBtn.addEventListener("click", () => {
