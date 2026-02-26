@@ -60,8 +60,10 @@ const ui = {
 };
 
 const START_MODE_KEY = "meme-market-start";
+const INTRO_SEEN_KEY = "meme-market-intro-seen";
 const startMode = sessionStorage.getItem(START_MODE_KEY);
-if (startMode === "new") {
+const isNewGame = startMode === "new";
+if (isNewGame) {
   clearRun();
   sessionStorage.removeItem(START_MODE_KEY);
 }
@@ -378,13 +380,15 @@ function showToast(message) {
   }, 3200);
 }
 
-function resetDailyChats() {
+function resetDailyChats({ seedBabe = true } = {}) {
   ui.chatLog.innerHTML = "";
   chatHistory.clear();
   unreadCounts.clear();
   latestAdviceByContact.clear();
   activeContactId = null;
-  seedBabeChat();
+  if (seedBabe) {
+    seedBabeChat();
+  }
   renderContacts();
   setChatView("list");
   ui.followBtn.disabled = true;
@@ -415,6 +419,39 @@ function closeDayModal() {
   }
   ui.dayModal.classList.remove("active");
   ui.dayModal.setAttribute("aria-hidden", "true");
+}
+
+function playIntroCutscene() {
+  const messages = [
+    "Babe <3: listen, you're great... but you don't make enough money for me. this just isnt gonna work out.",
+    "You: wait no please ill do better its the job market no ones hiring vibecoders",
+    "Babe <3: i lied ur not that great. but, if ur broke ahh can make a 100 grand in 7 days i'll THINK about it",
+    "You: what",
+    "Babe <3: you heard me. see u then",
+    "This contact has blocked you.",
+    "You: WAIT",
+  ];
+
+  localStorage.setItem(INTRO_SEEN_KEY, "1");
+  resetDailyChats({ seedBabe: false });
+  ensureChat("babe");
+  setActiveContact("babe");
+  setChatView("thread");
+  state.isPaused = true;
+  applyPauseState();
+
+  const stepMs = 1400;
+  messages.forEach((text, index) => {
+    setTimeout(() => {
+      addChatMessage(text, "babe");
+    }, stepMs * index);
+  });
+
+  setTimeout(() => {
+    state.isPaused = false;
+    applyPauseState();
+    scheduleChatPulse();
+  }, stepMs * messages.length + 200);
 }
 
 function applyPauseState() {
@@ -590,8 +627,11 @@ function tick() {
 }
 
 function init() {
+  const shouldPlayIntro = isNewGame && !localStorage.getItem(INTRO_SEEN_KEY);
+  if (!shouldPlayIntro) {
+    seedBabeChat();
+  }
   renderContacts();
-  seedBabeChat();
   setActiveTab(state.activeTab);
   setPhoneTab("chat");
   setChatView("list");
@@ -601,7 +641,11 @@ function init() {
   applyPauseState();
   seedFeed();
   scheduleFeedPulse();
-  scheduleChatPulse();
+  if (shouldPlayIntro) {
+    playIntroCutscene();
+  } else {
+    scheduleChatPulse();
+  }
 
   ui.tabs.forEach((button) =>
     button.addEventListener("click", () => setActiveTab(button.dataset.tab))
