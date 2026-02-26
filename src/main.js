@@ -104,6 +104,8 @@ const sellLossSfx = new Audio("/assets/fahh.mp3");
 sellLossSfx.volume = 0.6;
 const newDaySfx = new Audio("/assets/oioioi.mp3");
 newDaySfx.volume = 0.65;
+const buySfx = new Audio("/assets/cash.mp3");
+buySfx.volume = 0.6;
 let audioUnlocked = false;
 let pendingLoadSfx = false;
 
@@ -335,7 +337,7 @@ function unlockAudio() {
     return;
   }
   audioUnlocked = true;
-  [chatPing, sellProfitSfx, sellLossSfx, newDaySfx].forEach((audio) => {
+  [chatPing, sellProfitSfx, sellLossSfx, newDaySfx, buySfx].forEach((audio) => {
     try {
       audio.muted = true;
       const playResult = audio.play();
@@ -777,6 +779,9 @@ function followAdvice() {
   } else {
     result = buyAsset(portfolio, asset, amount);
     addChatMessage(`System: ${result.message}`);
+    if (result.ok) {
+      playSfx(buySfx);
+    }
   }
   latestAdviceByContact.delete(activeContactId);
   latestAdvice = null;
@@ -925,6 +930,9 @@ function init() {
     const amount = Number(ui.tradeAmount.value) || 1;
     const result = buyAsset(portfolio, asset, amount);
     addChatMessage(`System: ${result.message}`);
+    if (result.ok) {
+      playSfx(buySfx);
+    }
     updateHud();
   });
 
