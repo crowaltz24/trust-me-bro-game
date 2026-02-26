@@ -7,7 +7,7 @@ import {
   applyDailyExpense,
   portfolioSnapshot,
 } from "./portfolio.js";
-import { getCharacters, getAdvice } from "./characters.js";
+import { getCharacters, getAdvice, buildAdvicePrompt } from "./characters.js";
 import { generateFeed } from "./newsFeed.js";
 
 const ui = {
@@ -269,6 +269,36 @@ function renderChat(contactId) {
   ui.chatLog.scrollTop = ui.chatLog.scrollHeight;
 }
 
+function normalizeChatText(text) {
+  if (!text) {
+    return "";
+  }
+  return text.replace(/\s+/g, " ").trim();
+}
+
+async function fetchAdviceText(character, advice) {
+  const { system, user } = buildAdvicePrompt(character, advice);
+  try {
+    const response = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ system, user }),
+    });
+    if (!response.ok) {
+      throw new Error(`LLM request failed (${response.status})`);
+    }
+    const data = await response.json();
+    const text = normalizeChatText(data?.text);
+    if (!text) {
+      throw new Error("LLM returned empty text");
+    }
+    return text;
+  } catch (error) {
+    console.warn("LLM fallback:", error);
+    return advice.text;
+  }
+}
+
 function setActiveContact(contactId) {
   const contact = characters.find((item) => item.id === contactId);
   if (!contact) {
@@ -393,12 +423,13 @@ function scheduleFeedPulse() {
 
 function scheduleChatPulse() {
   const delay = 8000 + Math.floor(market.rng() * 12000);
-  chatTimer = setTimeout(() => {
+  chatTimer = setTimeout(async () => {
     const eligible = characters.filter((item) => item.id !== "babe");
     const character = eligible[Math.floor(market.rng() * eligible.length)];
     const advice = getAdvice(character, market, market.rng);
-    const tag = advice.isScheme ? "[SCHEME]" : "[LEGIT]";
-    addChatMessage(`${character.name} ${tag}: ${advice.text}`, character.id);
+    const text = await fetchAdviceText(character, advice);
+    advice.text = text;
+    addChatMessage(`${character.name}: ${advice.text}`, character.id);
     latestAdviceByContact.set(character.id, advice);
     if (activeContactId === character.id) {
       ui.followBtn.disabled = false;
@@ -408,20 +439,23 @@ function scheduleChatPulse() {
   }, delay);
 }
 
-function handleAdvice() {
+async function handleAdvice() {
   const character = characters.find((item) => item.id === activeContactId);
   if (!character) {
     return;
   }
+  ui.adviceBtn.disabled = true;
   latestAdvice = getAdvice(character, market, market.rng);
-  const tag = latestAdvice.isScheme ? "[SCHEME]" : "[LEGIT]";
-  addChatMessage(`${character.name} ${tag}: ${latestAdvice.text}`, character.id);
+  const text = await fetchAdviceText(character, latestAdvice);
+  latestAdvice.text = text;
+  addChatMessage(`${character.name}: ${latestAdvice.text}`, character.id);
   scheduleAdviceImpact(latestAdvice);
   latestAdviceByContact.set(character.id, latestAdvice);
   if (activeContactId !== "babe") {
     ui.followBtn.disabled = false;
     ui.followBtn.style.visibility = "visible";
   }
+  ui.adviceBtn.disabled = false;
 }
 
 function followAdvice() {
