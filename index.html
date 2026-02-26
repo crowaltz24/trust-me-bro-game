@@ -12,8 +12,7 @@
       <div class="landing-wrap">
         <div class="landing-copy">
           <h1>Trust Me Bro</h1>
-          <p class="landing-tagline"><i>play stupid games, win stupid prizes</i><p>
-
+          <p class="landing-tagline"><i>play stupid games, win stupid prizes</i></p>
           <p class="landing-kicker">a (terrible) stock market simulator where no one is your friend</p>
           <div class="landing-details">
             <div>
@@ -57,6 +56,11 @@
                   <button type="submit" id="landing-play">Play</button>
                   <p class="landing-message" id="landing-message" role="status"></p>
                 </form>
+                <div class="landing-start" id="landing-start">
+                  <button type="button" id="landing-continue">Continue game</button>
+                  <button type="button" class="secondary" id="landing-new">New game</button>
+                  <p class="landing-message" id="landing-start-message" role="status"></p>
+                </div>
               </div>
             </div>
           </div>
@@ -68,6 +72,31 @@
       const form = document.getElementById("landing-form");
       const button = document.getElementById("landing-play");
       const message = document.getElementById("landing-message");
+      const startPanel = document.getElementById("landing-start");
+      const startMessage = document.getElementById("landing-start-message");
+      const continueBtn = document.getElementById("landing-continue");
+      const newBtn = document.getElementById("landing-new");
+      const SAVE_KEY = "meme-market-save";
+      const START_MODE_KEY = "meme-market-start";
+
+      const showStartOptions = () => {
+        form.classList.add("is-hidden");
+        startPanel.classList.add("active");
+        const hasSave = Boolean(localStorage.getItem(SAVE_KEY));
+        continueBtn.disabled = !hasSave;
+        startMessage.textContent = hasSave ? "Pick up where you left off." : "No save found.";
+        startMessage.dataset.status = hasSave ? "" : "error";
+      };
+
+      continueBtn.addEventListener("click", () => {
+        sessionStorage.setItem(START_MODE_KEY, "continue");
+        window.location.href = "/game.html";
+      });
+
+      newBtn.addEventListener("click", () => {
+        sessionStorage.setItem(START_MODE_KEY, "new");
+        window.location.href = "/game.html";
+      });
 
       form.addEventListener("submit", async (event) => {
         event.preventDefault();
@@ -95,7 +124,7 @@
 
           const data = await response.json();
           if (data?.ok) {
-            window.location.href = "/game.html";
+            showStartOptions();
             return;
           }
 

@@ -120,6 +120,19 @@ export function createMarket(seed) {
   };
 }
 
+export function restoreMarket(savedMarket, seed) {
+  const rng = createRng(seed);
+  const assets = (savedMarket?.assets || []).map((asset) => ({
+    ...asset,
+    history: Array.isArray(asset.history) ? [...asset.history] : [],
+  }));
+  return {
+    rng,
+    assets,
+    lastEvent: savedMarket?.lastEvent || null,
+  };
+}
+
 export function tickMarket(market) {
   const decaySentiment = (asset) => {
     const magnitude = Math.abs(asset.sentiment);

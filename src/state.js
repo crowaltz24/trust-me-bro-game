@@ -1,4 +1,5 @@
 const STORAGE_KEY = "meme-market-state";
+const SAVE_KEY = "meme-market-save";
 
 export const DEFAULT_STATE = {
   tickMs: 1000,
@@ -34,6 +35,27 @@ export function loadState() {
 
 export function saveState(state) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+export function saveRun(snapshot) {
+  localStorage.setItem(SAVE_KEY, JSON.stringify(snapshot));
+}
+
+export function loadRun() {
+  const raw = localStorage.getItem(SAVE_KEY);
+  if (!raw) {
+    return null;
+  }
+  try {
+    return JSON.parse(raw);
+  } catch (error) {
+    return null;
+  }
+}
+
+export function clearRun() {
+  localStorage.removeItem(SAVE_KEY);
+  localStorage.removeItem(STORAGE_KEY);
 }
 
 export function createRng(seed) {

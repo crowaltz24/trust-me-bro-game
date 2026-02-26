@@ -144,6 +144,10 @@ body.landing {
   gap: 10px;
 }
 
+.landing-form.is-hidden {
+  display: none;
+}
+
 .landing-form label {
   margin: 0;
   font-size: 0.8rem;
@@ -170,6 +174,30 @@ body.landing {
 
 .landing-form button:hover {
   filter: brightness(1.05);
+}
+
+.landing-start {
+  display: none;
+  gap: 10px;
+}
+
+.landing-start.active {
+  display: grid;
+}
+
+.landing-start button {
+  background: var(--accent);
+  border: none;
+  color: #0b0f14;
+  padding: 10px 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.landing-start button.secondary {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
 }
 
 .landing-message {
@@ -540,6 +568,44 @@ select {
 .toast-hide {
   opacity: 0;
   transform: translateY(6px);
+}
+
+.day-modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(5, 8, 12, 0.7);
+  z-index: 10;
+}
+
+.day-modal.active {
+  display: flex;
+}
+
+.day-card {
+  width: min(340px, 90vw);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  padding: 20px;
+  text-align: center;
+  display: grid;
+  gap: 10px;
+}
+
+.day-card h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.day-card button {
+  background: var(--accent);
+  border: none;
+  color: #0b0f14;
+  padding: 10px 14px;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 .phone-top {

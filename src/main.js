@@ -1,5 +1,12 @@
-import { loadState, saveState, formatMoney, formatTimer } from "./state.js";
-import { createMarket, tickMarket, getAssetById, getAssetsByType, applyMarketEvent } from "./market.js";
+import { loadState, saveState, loadRun, saveRun, clearRun, formatMoney, formatTimer } from "./state.js";
+import {
+  createMarket,
+  restoreMarket,
+  tickMarket,
+  getAssetById,
+  getAssetsByType,
+  applyMarketEvent,
+} from "./market.js";
 import {
   createPortfolio,
   buyAsset,
@@ -18,6 +25,7 @@ const ui = {
   settingsBtn: document.getElementById("settings-btn"),
   settingsPanel: document.getElementById("phone-settings"),
   settingsClose: document.getElementById("settings-close"),
+  settingsMenu: document.getElementById("settings-menu"),
   settingsReset: document.getElementById("settings-reset"),
   tabs: document.querySelectorAll(".tab"),
   chart: document.getElementById("price-chart"),
@@ -46,11 +54,24 @@ const ui = {
   feedList: document.getElementById("feed-list"),
   refreshFeed: document.getElementById("refresh-feed"),
   toastStack: document.getElementById("toast-stack"),
+  dayModal: document.getElementById("day-modal"),
+  dayModalTitle: document.getElementById("day-modal-title"),
+  dayStartBtn: document.getElementById("day-start-btn"),
 };
 
-let state = loadState();
-let market = createMarket(state.seed);
-let portfolio = createPortfolio(state.cash);
+const START_MODE_KEY = "meme-market-start";
+const startMode = sessionStorage.getItem(START_MODE_KEY);
+if (startMode === "new") {
+  clearRun();
+  sessionStorage.removeItem(START_MODE_KEY);
+}
+const savedRun = loadRun();
+let state = savedRun?.state ? { ...loadState(), ...savedRun.state } : loadState();
+let market = savedRun?.market ? restoreMarket(savedRun.market, state.seed) : createMarket(state.seed);
+let portfolio = savedRun?.portfolio ? savedRun.portfolio : createPortfolio(state.cash);
+if (portfolio?.cash != null) {
+  state.cash = portfolio.cash;
+}
 const characters = getCharacters();
 let latestAdvice = null;
 let tickHandle = null;
@@ -357,6 +378,45 @@ function showToast(message) {
   }, 3200);
 }
 
+function resetDailyChats() {
+  ui.chatLog.innerHTML = "";
+  chatHistory.clear();
+  unreadCounts.clear();
+  latestAdviceByContact.clear();
+  activeContactId = null;
+  seedBabeChat();
+  renderContacts();
+  setChatView("list");
+  ui.followBtn.disabled = true;
+  ui.followBtn.style.visibility = "hidden";
+}
+
+function nudgeDailySentiment() {
+  market.assets.forEach((asset) => {
+    const drift = (market.rng() - 0.5) * 0.08;
+    asset.sentiment += drift;
+  });
+}
+
+function openDayModal(dayNumber) {
+  if (!ui.dayModal) {
+    return;
+  }
+  const label = `Begin day ${dayNumber}`;
+  ui.dayModalTitle.textContent = label;
+  ui.dayStartBtn.textContent = label;
+  ui.dayModal.classList.add("active");
+  ui.dayModal.setAttribute("aria-hidden", "false");
+}
+
+function closeDayModal() {
+  if (!ui.dayModal) {
+    return;
+  }
+  ui.dayModal.classList.remove("active");
+  ui.dayModal.setAttribute("aria-hidden", "true");
+}
+
 function applyPauseState() {
   const isPaused = Boolean(state.isPaused);
   ui.buyBtn.disabled = isPaused;
@@ -494,6 +554,18 @@ function updateHud() {
   updateActiveAsset(state.activeAssetId);
 }
 
+function buildRunSnapshot() {
+  return {
+    savedAt: Date.now(),
+    state: { ...state, cash: portfolio.cash },
+    market: {
+      assets: market.assets,
+      lastEvent: market.lastEvent,
+    },
+    portfolio,
+  };
+}
+
 function tick() {
   if (state.isPaused) {
     return;
@@ -506,6 +578,11 @@ function tick() {
     state.dayCount += 1;
     applyDailyExpense(portfolio);
     addChatMessage(`System: Daily expenses charged $${portfolio.dailyExpense}.`);
+    saveRun(buildRunSnapshot());
+    showToast("Game saved!");
+    state.isPaused = true;
+    applyPauseState();
+    openDayModal(state.dayCount);
   }
 
   updateHud();
@@ -602,8 +679,19 @@ function init() {
     applyPauseState();
   });
 
+  if (ui.dayStartBtn) {
+    ui.dayStartBtn.addEventListener("click", () => {
+      resetDailyChats();
+      nudgeDailySentiment();
+      closeDayModal();
+      state.isPaused = false;
+      applyPauseState();
+      updateHud();
+    });
+  }
+
   const resetRun = () => {
-    localStorage.clear();
+    clearRun();
     state = loadState();
     market = createMarket(state.seed);
     portfolio = createPortfolio(state.cash);
@@ -640,6 +728,15 @@ function init() {
   ui.settingsClose.addEventListener("click", () => {
     ui.settingsPanel.classList.remove("active");
   });
+
+  if (ui.settingsMenu) {
+    ui.settingsMenu.addEventListener("click", () => {
+      saveRun(buildRunSnapshot());
+      saveState({ ...state, cash: portfolio.cash });
+      ui.settingsPanel.classList.remove("active");
+      window.location.href = "/";
+    });
+  }
 
   ui.settingsReset.addEventListener("click", () => {
     ui.settingsPanel.classList.remove("active");
