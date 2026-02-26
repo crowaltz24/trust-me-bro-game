@@ -61,6 +61,10 @@ const ui = {
 };
 
 const START_MODE_KEY = "meme-market-start";
+const AUTH_KEY = "meme-market-auth";
+if (!sessionStorage.getItem(AUTH_KEY)) {
+  window.location.replace("/");
+}
 const startMode = sessionStorage.getItem(START_MODE_KEY);
 const isNewGame = startMode === "new";
 if (isNewGame) {

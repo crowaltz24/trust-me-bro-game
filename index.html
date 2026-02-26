@@ -94,6 +94,7 @@
       const SAVE_KEY = "meme-market-save";
       const START_MODE_KEY = "meme-market-start";
       const INTRO_SEEN_KEY = "meme-market-intro-seen";
+      const AUTH_KEY = "meme-market-auth";
       const ping = new Audio("/assets/notification.mp3");
       ping.volume = 0.55;
 
@@ -107,12 +108,14 @@
       };
 
       continueBtn.addEventListener("click", () => {
+        sessionStorage.setItem(AUTH_KEY, "1");
         sessionStorage.setItem(START_MODE_KEY, "continue");
         window.location.href = "/game.html";
       });
 
       newBtn.addEventListener("click", () => {
         const shouldPlayIntro = !localStorage.getItem(INTRO_SEEN_KEY);
+        sessionStorage.setItem(AUTH_KEY, "1");
         sessionStorage.setItem(START_MODE_KEY, "new");
         if (!shouldPlayIntro) {
           window.location.href = "/game.html";
@@ -173,6 +176,7 @@
       };
 
       cutsceneContinue.addEventListener("click", () => {
+        sessionStorage.setItem(AUTH_KEY, "1");
         window.location.href = "/game.html";
       });
 
@@ -202,6 +206,7 @@
 
           const data = await response.json();
           if (data?.ok) {
+            sessionStorage.setItem(AUTH_KEY, "1");
             showStartOptions();
             return;
           }
