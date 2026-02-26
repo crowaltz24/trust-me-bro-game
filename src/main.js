@@ -251,7 +251,7 @@ function seedBabeChat() {
   if (messages.length === 0) {
     messages.push("You: I miss you.");
     messages.push("You: please  come back");
-    messages.push("You: listen i can change");
+    messages.push("You: listen i can treat you better");
     messages.push("You: Im outside");
     messages.push("You: I NEVER LOVED YOY AMYWAY")
   }
