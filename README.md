@@ -18,18 +18,17 @@ When you start a new game, you'll be greeted with your desktop showing a graph s
 
 You can trade in both Stocks and Crypto here. Select different assets to view their trajectories.
 
-> [!NOTE]
->**To buy an asset:**
->1. Select the appropriate tab at the top of the window depending on what type of commodity you're trading
->2. Go to the **Trade** window
->3. Use the drop down to select which asset you wish to buy
->4. Enter the quantity of the asset you wish to buy
->5. Click Buy
->
->**To sell an asset:**
->1. Find the asset in your **Portfolio** window
->2. Use the slider to select how much of it you wish to sell
->3. Click sell
+**To buy an asset:**
+1. Select the appropriate tab at the top of the window depending on what type of commodity you're trading
+2. Go to the **Trade** window
+3. Use the drop down to select which asset you wish to buy
+4. Enter the quantity of the asset you wish to buy
+5. Click Buy
+
+**To sell an asset:**
+1. Find the asset in your **Portfolio** window
+2. Use the slider to select how much of it you wish to sell
+3. Click sell
 
 
 ### Phone
