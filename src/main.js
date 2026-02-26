@@ -766,6 +766,7 @@ function followAdvice() {
   if (advice.intent === "sell" || advice.intent === "short") {
     const pnl = computeSellPnl(asset, amount);
     result = sellAsset(portfolio, asset, amount);
+    addChatMessage(`System: ${formatSellMessage(result, pnl, asset.id, amount)}`);
     if (result.ok && pnl != null) {
       if (pnl > 0) {
         playSfx(sellProfitSfx);
@@ -775,8 +776,8 @@ function followAdvice() {
     }
   } else {
     result = buyAsset(portfolio, asset, amount);
+    addChatMessage(`System: ${result.message}`);
   }
-  addChatMessage(`System: ${result.message}`);
   latestAdviceByContact.delete(activeContactId);
   latestAdvice = null;
   ui.followBtn.disabled = true;
@@ -807,6 +808,20 @@ function formatDaySummary(delta) {
     return `Loss: ${formatMoney(delta)} today.`;
   }
   return `Flat day: ${formatMoney(0)}.`;
+}
+
+function formatSellMessage(result, pnl, assetId, amount) {
+  if (!result?.ok || pnl == null) {
+    return result?.message || "Sell failed.";
+  }
+  const amountLabel = amount ? `${amount} ` : "";
+  if (pnl > 0) {
+    return `Sold ${amountLabel}${assetId} for a profit of ${formatMoney(pnl)}.`;
+  }
+  if (pnl < 0) {
+    return `Sold ${amountLabel}${assetId} for a loss of ${formatMoney(Math.abs(pnl))}.`;
+  }
+  return `Sold ${amountLabel}${assetId}.`;
 }
 
 function syncSettingsToggles() {
@@ -919,7 +934,7 @@ function init() {
       const amount = Number(ui.tradeAmount.value) || 1;
       const pnl = computeSellPnl(asset, amount);
       const result = sellAsset(portfolio, asset, amount);
-      addChatMessage(`System: ${result.message}`);
+      addChatMessage(`System: ${formatSellMessage(result, pnl, asset.id, amount)}`);
       if (result.ok && pnl != null) {
         if (pnl > 0) {
           playSfx(sellProfitSfx);
@@ -957,7 +972,7 @@ function init() {
     }
     const pnl = computeSellPnl(asset, amount);
     const result = sellAsset(portfolio, asset, amount);
-    addChatMessage(`System: ${result.message}`);
+    addChatMessage(`System: ${formatSellMessage(result, pnl, asset.id, amount)}`);
     if (result.ok && pnl != null) {
       if (pnl > 0) {
         playSfx(sellProfitSfx);
