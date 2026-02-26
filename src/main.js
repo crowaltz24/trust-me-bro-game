@@ -85,6 +85,8 @@ let feedItems = [];
 let feedCounter = 0;
 let chatTimer = null;
 let feedTimer = null;
+const chatPing = new Audio("/assets/notification.mp3");
+chatPing.volume = 0.55;
 
 function setActiveTab(tab) {
   state.activeTab = tab;
@@ -259,6 +261,30 @@ function setChatView(view) {
   ui.chatThreadView.classList.toggle("active", view === "thread");
 }
 
+function shouldPlayPing(text) {
+  if (!text) {
+    return false;
+  }
+  const trimmed = text.trim();
+  if (!trimmed) {
+    return false;
+  }
+  if (trimmed.startsWith("You:")) {
+    return false;
+  }
+  return !trimmed.startsWith("System:");
+}
+
+function playChatPing() {
+  try {
+    const sound = chatPing.cloneNode(true);
+    sound.volume = chatPing.volume;
+    sound.play();
+  } catch (error) {
+    // Ignore autoplay failures.
+  }
+}
+
 function renderContacts() {
   ui.contactList.innerHTML = "";
   characters.forEach((character) => {
@@ -349,6 +375,9 @@ function addChatMessage(text, contactId = activeContactId) {
   }
   if (!contactId) {
     return;
+  }
+  if (shouldPlayPing(text)) {
+    playChatPing();
   }
   ensureChat(contactId);
   const messages = chatHistory.get(contactId);
