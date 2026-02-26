@@ -24,10 +24,10 @@ const CHARACTERS = [
     impact: 0.12,
   },
   {
-    id: "skeptic",
-    name: "Skeptic Analyst",
+    id: "tcs",
+    name: "TCS Bhediya",
     style: "akshually ☝️🤓",
-    persona: "Pedantic analyst who nitpicks, cites caveats, and hates sloppy reasoning.",
+    persona: "Indian Computer engineer who's new but a natural at trading. Nitpicks, cites caveats, and hates sloppy reasoning. Annoying, nerdy. Says 'bhai' and 'yaar'",
     schemeChance: 0.3,
     impact: 0.3,
   },
