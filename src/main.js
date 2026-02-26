@@ -187,7 +187,7 @@ function renderPortfolio() {
   }
   if (snapshots.length === 0) {
     ui.portfolioList.innerHTML = "";
-    ui.portfolioList.textContent = "No positions yet.";
+    // ui.portfolioList.textContent = "No positions yet.";
     return;
   }
   snapshots.forEach((position) => {
