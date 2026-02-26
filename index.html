@@ -6,153 +6,109 @@
     <title>Trust Me Bro</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
-  <body>
-    <div class="app">
-      <header class="topbar">
-        <div>
+  <body class="landing">
+    <div class="landing-bg"></div>
+    <main class="landing-hero">
+      <div class="landing-wrap">
+        <div class="landing-copy">
+          <p class="landing-kicker">Welcome to the chat casino</p>
           <h1>Trust Me Bro</h1>
-          <p class="subtitle"><i>play stupid games, win stupid prizes</i></p>
+          <p class="landing-tagline">Play stupid games, win stupid prizes.</p>
+          <div class="landing-details">
+            <div>
+              <span>Live</span>
+              <strong>Market chaos</strong>
+            </div>
+            <div>
+              <span>Signal</span>
+              <strong>Sketchy DMs</strong>
+            </div>
+            <div>
+              <span>Risk</span>
+              <strong>Unlimited</strong>
+            </div>
+          </div>
         </div>
-      </header>
 
-      <main class="grid">
-        <section class="panel main-panel">
-          <div class="panel-header">
-            <div class="tabs">
-              <button class="tab active" data-tab="stocks">Stocks</button>
-              <button class="tab" data-tab="crypto">Crypto</button>
-            </div>
-            <div class="controls">
-              <button id="pause-btn">Pause</button>
-            </div>
-          </div>
-
-          <div class="chart-wrap">
-            <canvas id="price-chart" width="900" height="260"></canvas>
-            <div class="chart-meta">
-              <div>
-                <h2 id="active-asset">DDY</h2>
-                <p id="asset-description">Meme stock</p>
-              </div>
-              <div class="price-info">
-                <div>
-                  <span>Price</span>
-                  <strong id="asset-price">$0</strong>
-                </div>
-                <div>
-                  <span>Sentiment</span>
-                  <strong id="asset-sentiment">0.00</strong>
-                </div>
-                <div>
-                  <span>Volatility</span>
-                  <strong id="asset-volatility">0.00</strong>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="trade-grid">
-            <div class="panel sub-panel">
-              <div class="panel-top">
-                <h3>Trade</h3>
-                <div class="trade-actions">
-                  <button id="buy-btn">Buy</button>
-                  <button id="sell-btn" class="secondary">Sell</button>
-                </div>
-              </div>
-              <label>
-                Asset
-                <select id="asset-select"></select>
-              </label>
-              <label>
-                Amount (shares/coins)
-                <input id="trade-amount" type="number" min="1" step="1" value="10" />
-              </label>
-            </div>
-            <div class="panel sub-panel">
-              <div class="panel-top portfolio-header">
-                <h3>Portfolio</h3>
-                <div class="portfolio-total">
-                  <strong id="portfolio-total">$0</strong>
-                </div>
-              </div>
-              <div class="portfolio" id="portfolio-list"></div>
-            </div>
-          </div>
-        </section>
-
-        <aside class="phone">
+        <div class="landing-phone">
           <div class="phone-shell">
             <div class="phone-top">
               <span class="phone-speaker"></span>
               <span class="phone-camera"></span>
             </div>
             <div class="phone-screen">
-              <div class="phone-header">
-                <h3>Phone</h3>
-                <div class="phone-actions">
-                  <div class="phone-tabs">
-                    <button class="phone-tab active" data-phone="chat">Chats</button>
-                    <button class="phone-tab" data-phone="social">Feed</button>
-                  </div>
-                  <button id="settings-btn" class="secondary">⚙</button>
+              <div class="landing-screen">
+                <div class="landing-screen-header">
+                  <span class="landing-chip">Private Access</span>
+                  <h2>Enter the market.</h2>
+                  <p>Drop the password to unlock the phone.</p>
                 </div>
-              </div>
-
-              <div class="phone-settings" id="phone-settings">
-                <div class="phone-settings-header">
-                  <h4>Settings</h4>
-                  <button id="settings-close" class="secondary">Close</button>
-                </div>
-                <button id="settings-reset">Reset Run</button>
-              </div>
-
-              <div class="phone-body">
-                <div class="phone-panel active" id="phone-chat">
-                  <div class="chat-list-view active" id="chat-list-view">
-                    <div class="feed-header">
-                      <h4>Contacts</h4>
-                    </div>
-                    <div class="chat-list" id="contact-list"></div>
-                  </div>
-
-                  <div class="chat-thread-view" id="chat-thread-view">
-                    <div class="chat-thread-header">
-                      <button id="back-to-contacts" class="secondary">&lt;</button>
-                      <div>
-                        <h4 id="chat-contact-name">Contact</h4>
-                        <p class="contact-meta" id="chat-contact-style"></p>
-                      </div>
-                    </div>
-                    <div class="chat" id="chat-log"></div>
-                    <div class="chat-actions">
-                      <button id="advice-btn">Chat</button>
-                      <button id="follow-btn" class="secondary">Follow Advice</button>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="phone-panel" id="phone-social">
-                  <div class="feed-header">
-                    <h4>Social + News</h4>
-                    <button id="refresh-feed">Refresh</button>
-                  </div>
-                  <div class="feed-body" id="feed-list"></div>
-                </div>
-              </div>
-
-              <div class="phone-footer status">
-                <div><span>Day</span> <strong id="day-count">1</strong></div>
-                <div><span>Time</span> <strong id="day-timer">04:59</strong></div>
-                <div><span>Cash</span> <strong id="cash-balance">$0</strong></div>
+                <form class="landing-form" id="landing-form">
+                  <label for="landing-password">Password</label>
+                  <input
+                    id="landing-password"
+                    name="password"
+                    type="password"
+                    autocomplete="current-password"
+                    placeholder="********"
+                    required
+                  />
+                  <button type="submit" id="landing-play">Play</button>
+                  <p class="landing-message" id="landing-message" role="status"></p>
+                </form>
               </div>
             </div>
           </div>
-          <div class="toast-stack" id="toast-stack"></div>
-        </aside>
-      </main>
-    </div>
+        </div>
+      </div>
+    </main>
 
-    <script type="module" src="src/main.js"></script>
+    <script>
+      const form = document.getElementById("landing-form");
+      const button = document.getElementById("landing-play");
+      const message = document.getElementById("landing-message");
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const password = document.getElementById("landing-password").value.trim();
+        if (!password) {
+          message.textContent = "Enter the password.";
+          message.dataset.status = "error";
+          return;
+        }
+
+        button.disabled = true;
+        message.textContent = "Checking...";
+        message.dataset.status = "busy";
+
+        try {
+          const response = await fetch("/api/verify", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ password }),
+          });
+
+          if (!response.ok) {
+            throw new Error("Invalid password");
+          }
+
+          const data = await response.json();
+          if (data?.ok) {
+            window.location.href = "/game.html";
+            return;
+          }
+
+          throw new Error("Invalid password");
+        } catch (error) {
+          message.textContent = "Nope. Try again.";
+          message.dataset.status = "error";
+          form.classList.remove("shake");
+          void form.offsetWidth;
+          form.classList.add("shake");
+        } finally {
+          button.disabled = false;
+        }
+      });
+    </script>
   </body>
 </html>
