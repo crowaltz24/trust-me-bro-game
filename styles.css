@@ -246,6 +246,27 @@ body.landing {
   filter: grayscale(0.2);
 }
 
+#buy-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: grayscale(0.2);
+}
+
+#advice-btn:disabled,
+#follow-btn:disabled,
+#refresh-feed:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: grayscale(0.2);
+}
+
+.row-exec:disabled,
+.row-slider:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: grayscale(0.2);
+}
+
 .landing-message {
   min-height: 18px;
   font-size: 0.85rem;

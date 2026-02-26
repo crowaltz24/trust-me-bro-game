@@ -93,6 +93,8 @@ let feedCounter = 0;
 let feedVisibleCount = 0;
 let chatTimer = null;
 let feedTimer = null;
+let nextChatAt = null;
+let nextFeedAt = null;
 let dayStartNetWorth = null;
 const chatPing = new Audio("/assets/notification.mp3");
 chatPing.volume = 0.55;
@@ -236,6 +238,16 @@ function renderPortfolio() {
   });
 
   existingRows.forEach((row) => row.remove());
+  setPortfolioControlsDisabled(Boolean(state.isPaused));
+}
+
+function setPortfolioControlsDisabled(disabled) {
+  ui.portfolioList.querySelectorAll(".row-exec").forEach((button) => {
+    button.disabled = disabled;
+  });
+  ui.portfolioList.querySelectorAll(".row-slider").forEach((slider) => {
+    slider.disabled = disabled;
+  });
 }
 
 function applyPnlClass(element, value) {
@@ -445,6 +457,7 @@ function setActiveContact(contactId) {
   ui.adviceBtn.style.visibility = controlsDisabled ? "hidden" : "visible";
   ui.followBtn.style.visibility = controlsDisabled || !adviceForContact ? "hidden" : "visible";
   setChatView("thread");
+  syncActionButtons(Boolean(state.isPaused));
 }
 
 function addChatMessage(text, contactId = activeContactId) {
@@ -538,6 +551,37 @@ function applyPauseState() {
     ui.sellBtn.disabled = isPaused;
   }
   ui.pauseBtn.textContent = isPaused ? "Resume" : "Pause";
+  syncActionButtons(isPaused);
+  setPortfolioControlsDisabled(isPaused);
+  if (isPaused) {
+    pauseBackgroundTimers();
+  } else {
+    resumeBackgroundTimers();
+  }
+}
+
+function syncActionButtons(isPaused) {
+  if (isPaused) {
+    ui.adviceBtn.disabled = true;
+    ui.followBtn.disabled = true;
+    if (ui.refreshFeed) {
+      ui.refreshFeed.disabled = true;
+    }
+    return;
+  }
+
+  if (!activeContactId || activeContactId === "babe") {
+    ui.adviceBtn.disabled = true;
+    ui.followBtn.disabled = true;
+  } else {
+    ui.adviceBtn.disabled = false;
+    const adviceForContact = latestAdviceByContact.get(activeContactId);
+    ui.followBtn.disabled = !adviceForContact;
+  }
+
+  if (ui.refreshFeed) {
+    ui.refreshFeed.disabled = false;
+  }
 }
 
 function renderFeed() {
@@ -602,9 +646,13 @@ function seedFeed() {
   renderFeed();
 }
 
-function scheduleFeedPulse() {
-  const delay = 6000 + Math.floor(market.rng() * 8000);
+function scheduleFeedPulseWithDelay(delay) {
+  nextFeedAt = Date.now() + delay;
   feedTimer = setTimeout(() => {
+    feedTimer = null;
+    if (state.isPaused) {
+      return;
+    }
     const items = generateFeed(market.rng, market.assets).slice(0, 2);
     const impactDelay = 2000 + Math.floor(market.rng() * 3000);
     queueFeedItems(items, impactDelay);
@@ -612,12 +660,18 @@ function scheduleFeedPulse() {
   }, delay);
 }
 
-function scheduleChatPulse() {
-  const baseDelay = 8000 + Math.floor(market.rng() * 12000);
-  const dayProgress = state.daySeconds > 0 ? state.elapsedToday / state.daySeconds : 0;
-  const multiplier = dayProgress >= 0.5 ? 0.6 : 1;
-  const delay = Math.floor(baseDelay * multiplier);
+function scheduleFeedPulse() {
+  const delay = 6000 + Math.floor(market.rng() * 8000);
+  scheduleFeedPulseWithDelay(delay);
+}
+
+function scheduleChatPulseWithDelay(delay) {
+  nextChatAt = Date.now() + delay;
   chatTimer = setTimeout(async () => {
+    chatTimer = null;
+    if (state.isPaused) {
+      return;
+    }
     const eligible = characters.filter((item) => item.id !== "babe");
     const character = eligible[Math.floor(market.rng() * eligible.length)];
     const advice = getAdvice(character, market, market.rng);
@@ -633,7 +687,47 @@ function scheduleChatPulse() {
   }, delay);
 }
 
+function scheduleChatPulse() {
+  const baseDelay = 8000 + Math.floor(market.rng() * 12000);
+  const dayProgress = state.daySeconds > 0 ? state.elapsedToday / state.daySeconds : 0;
+  const multiplier = dayProgress >= 0.5 ? 0.6 : 1;
+  const delay = Math.floor(baseDelay * multiplier);
+  scheduleChatPulseWithDelay(delay);
+}
+
+function pauseBackgroundTimers() {
+  if (chatTimer) {
+    clearTimeout(chatTimer);
+    chatTimer = null;
+  }
+  if (feedTimer) {
+    clearTimeout(feedTimer);
+    feedTimer = null;
+  }
+}
+
+function resumeBackgroundTimers() {
+  const now = Date.now();
+  if (!chatTimer) {
+    if (nextChatAt && nextChatAt > now) {
+      scheduleChatPulseWithDelay(nextChatAt - now);
+    } else {
+      scheduleChatPulse();
+    }
+  }
+  if (!feedTimer) {
+    if (nextFeedAt && nextFeedAt > now) {
+      scheduleFeedPulseWithDelay(nextFeedAt - now);
+    } else {
+      scheduleFeedPulse();
+    }
+  }
+}
+
 async function handleAdvice() {
+  if (state.isPaused) {
+    return;
+  }
   const character = characters.find((item) => item.id === activeContactId);
   if (!character) {
     return;
@@ -653,6 +747,9 @@ async function handleAdvice() {
 }
 
 function followAdvice() {
+  if (state.isPaused) {
+    return;
+  }
   const advice = latestAdviceByContact.get(activeContactId);
   if (!advice) {
     addChatMessage("System: No advice to follow.");
@@ -784,8 +881,7 @@ function init() {
     pendingLoadSfx = true;
   }
   seedFeed();
-  scheduleFeedPulse();
-  scheduleChatPulse();
+  resumeBackgroundTimers();
 
   ui.tabs.forEach((button) =>
     button.addEventListener("click", () => setActiveTab(button.dataset.tab))
@@ -907,12 +1003,9 @@ function init() {
     feedItems = [];
     feedCounter = 0;
     feedVisibleCount = 0;
-    if (chatTimer) {
-      clearTimeout(chatTimer);
-    }
-    if (feedTimer) {
-      clearTimeout(feedTimer);
-    }
+    pauseBackgroundTimers();
+    nextChatAt = null;
+    nextFeedAt = null;
     seedBabeChat();
     renderContacts();
     setChatView("list");
@@ -920,8 +1013,7 @@ function init() {
     updateActiveAsset(state.activeAssetId);
     ui.tradeAmount.value = 10;
     seedFeed();
-    scheduleFeedPulse();
-    scheduleChatPulse();
+    resumeBackgroundTimers();
     updateHud();
     applyPauseState();
     syncSettingsToggles();
