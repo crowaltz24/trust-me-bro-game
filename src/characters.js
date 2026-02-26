@@ -3,7 +3,7 @@ const CHARACTERS = [
     id: "cryptobro",
     name: "Crypto Bro",
     style: "exit liquidity enthusiast",
-    persona: "Hype-chasing obnoxious crypto gambler who talks fast, flexes wins, and leans on buzzwords. Spams emojis like 🚀 or 💎",
+    persona: "Hype-chasing obnoxious crypto gambler who talks fast, flexes wins, and leans on buzzwords. Spams emojis like 🚀📈💎",
     schemeChance: 0.45,
     impact: 0.18,
   },
