@@ -42,6 +42,7 @@ const ui = {
   portfolioTotal: document.getElementById("portfolio-total"),
   phoneTabs: document.querySelectorAll(".phone-tab"),
   phonePanels: document.querySelectorAll(".phone-panel"),
+  chatTab: document.getElementById("chat-tab"),
   contactList: document.getElementById("contact-list"),
   chatListView: document.getElementById("chat-list-view"),
   chatThreadView: document.getElementById("chat-thread-view"),
@@ -60,7 +61,6 @@ const ui = {
 };
 
 const START_MODE_KEY = "meme-market-start";
-const INTRO_SEEN_KEY = "meme-market-intro-seen";
 const startMode = sessionStorage.getItem(START_MODE_KEY);
 const isNewGame = startMode === "new";
 if (isNewGame) {
@@ -83,6 +83,7 @@ const unreadCounts = new Map();
 const latestAdviceByContact = new Map();
 let feedItems = [];
 let feedCounter = 0;
+let feedVisibleCount = 0;
 let chatTimer = null;
 let feedTimer = null;
 const chatPing = new Audio("/assets/notification.mp3");
@@ -303,6 +304,7 @@ function renderContacts() {
     `;
     ui.contactList.appendChild(button);
   });
+  updateChatTabUnread();
 }
 
 function renderChat(contactId) {
@@ -388,6 +390,7 @@ function addChatMessage(text, contactId = activeContactId) {
     return;
   }
   renderChat(contactId);
+  updateChatTabUnread();
 }
 
 function showToast(message) {
@@ -422,6 +425,7 @@ function resetDailyChats({ seedBabe = true } = {}) {
   setChatView("list");
   ui.followBtn.disabled = true;
   ui.followBtn.style.visibility = "hidden";
+  updateChatTabUnread();
 }
 
 function nudgeDailySentiment() {
@@ -450,39 +454,6 @@ function closeDayModal() {
   ui.dayModal.setAttribute("aria-hidden", "true");
 }
 
-function playIntroCutscene() {
-  const messages = [
-    "Babe <3: listen, you're great... but you don't make enough money for me. this just isnt gonna work out.",
-    "You: wait no please ill do better its the job market no ones hiring vibecoders",
-    "Babe <3: i lied ur not that great. but, if ur broke ahh can make a 100 grand in 7 days i'll THINK about it",
-    "You: what",
-    "Babe <3: you heard me. see u then",
-    "This contact has blocked you.",
-    "You: WAIT",
-  ];
-
-  localStorage.setItem(INTRO_SEEN_KEY, "1");
-  resetDailyChats({ seedBabe: false });
-  ensureChat("babe");
-  setActiveContact("babe");
-  setChatView("thread");
-  state.isPaused = true;
-  applyPauseState();
-
-  const stepMs = 1400;
-  messages.forEach((text, index) => {
-    setTimeout(() => {
-      addChatMessage(text, "babe");
-    }, stepMs * index);
-  });
-
-  setTimeout(() => {
-    state.isPaused = false;
-    applyPauseState();
-    scheduleChatPulse();
-  }, stepMs * messages.length + 200);
-}
-
 function applyPauseState() {
   const isPaused = Boolean(state.isPaused);
   ui.buyBtn.disabled = isPaused;
@@ -492,7 +463,7 @@ function applyPauseState() {
 
 function renderFeed() {
   ui.feedList.innerHTML = "";
-  feedItems.forEach((item) => {
+  feedItems.slice(0, feedVisibleCount).forEach((item) => {
     const div = document.createElement("div");
     div.className = "feed-item";
     if (item.pending) {
@@ -501,6 +472,17 @@ function renderFeed() {
     div.textContent = `${item.kind.toUpperCase()}: ${item.text}`;
     ui.feedList.appendChild(div);
   });
+}
+
+function updateChatTabUnread() {
+  if (!ui.chatTab) {
+    return;
+  }
+  let totalUnread = 0;
+  unreadCounts.forEach((count) => {
+    totalUnread += count || 0;
+  });
+  ui.chatTab.textContent = totalUnread > 0 ? `Chats (${totalUnread})` : "Chats";
 }
 
 function queueFeedItems(items, delayMs) {
@@ -514,6 +496,7 @@ function queueFeedItems(items, delayMs) {
     }, delayMs);
   });
   feedItems = feedItems.slice(0, 50);
+  feedVisibleCount = Math.min(feedVisibleCount, feedItems.length);
   renderFeed();
 }
 
@@ -529,12 +512,15 @@ function scheduleAdviceImpact(advice) {
 }
 
 function refreshFeed() {
+  feedVisibleCount = feedItems.length;
   renderFeed();
 }
 
 function seedFeed() {
   const items = generateFeed(market.rng, market.assets).slice(0, 3);
   queueFeedItems(items, 2000);
+  feedVisibleCount = feedItems.length;
+  renderFeed();
 }
 
 function scheduleFeedPulse() {
@@ -656,10 +642,7 @@ function tick() {
 }
 
 function init() {
-  const shouldPlayIntro = isNewGame && !localStorage.getItem(INTRO_SEEN_KEY);
-  if (!shouldPlayIntro) {
-    seedBabeChat();
-  }
+  seedBabeChat();
   renderContacts();
   setActiveTab(state.activeTab);
   setPhoneTab("chat");
@@ -670,11 +653,7 @@ function init() {
   applyPauseState();
   seedFeed();
   scheduleFeedPulse();
-  if (shouldPlayIntro) {
-    playIntroCutscene();
-  } else {
-    scheduleChatPulse();
-  }
+  scheduleChatPulse();
 
   ui.tabs.forEach((button) =>
     button.addEventListener("click", () => setActiveTab(button.dataset.tab))
@@ -775,6 +754,7 @@ function init() {
     latestAdviceByContact.clear();
     feedItems = [];
     feedCounter = 0;
+    feedVisibleCount = 0;
     if (chatTimer) {
       clearTimeout(chatTimer);
     }

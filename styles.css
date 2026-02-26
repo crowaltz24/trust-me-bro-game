@@ -148,6 +148,10 @@ body.landing {
   display: none;
 }
 
+.landing-screen-header.is-hidden {
+  display: none;
+}
+
 .landing-form label {
   margin: 0;
   font-size: 0.8rem;
@@ -185,6 +189,42 @@ body.landing {
   display: grid;
 }
 
+.landing-cutscene {
+  display: none;
+  gap: 10px;
+}
+
+.landing-cutscene.active {
+  display: grid;
+}
+
+.landing-cutscene-header {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-family: "IBM Plex Mono", monospace;
+}
+
+.landing-chat {
+  height: 280px;
+  overflow-y: auto;
+}
+
+#landing-cutscene-continue {
+  display: none;
+  background: var(--accent);
+  border: none;
+  color: #0b0f14;
+  padding: 10px 14px;
+  font-weight: 700;
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+#landing-cutscene-continue.active {
+  display: block;
+  opacity: 1;
+}
+
 .landing-start button {
   background: var(--accent);
   border: none;
@@ -198,6 +238,12 @@ body.landing {
   background: transparent;
   color: var(--accent);
   border: 1px solid var(--accent);
+}
+
+.landing-start button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: grayscale(0.2);
 }
 
 .landing-message {

@@ -13,7 +13,7 @@
         <div class="landing-copy">
           <h1>Trust Me Bro</h1>
           <p class="landing-tagline"><i>play stupid games, win stupid prizes</i></p>
-          <p class="landing-kicker">a (terrible) stock market simulator where no one is your friend</p>
+          <p class="landing-kicker">a (bad) stock market simulator where no one is your friend</p>
           <div class="landing-details">
             <div>
               <span>Advice?</span>
@@ -38,7 +38,7 @@
             </div>
             <div class="phone-screen">
               <div class="landing-screen">
-                <div class="landing-screen-header">
+                <div class="landing-screen-header" id="landing-header">
                   <span class="landing-chip">Private Access</span>
                   <h2>Enter the market.</h2>
                   <p>Drop the password to unlock the phone.</p>
@@ -58,8 +58,14 @@
                 </form>
                 <div class="landing-start" id="landing-start">
                   <button type="button" id="landing-continue">Continue game</button>
-                  <button type="button" class="secondary" id="landing-new">New game</button>
                   <p class="landing-message" id="landing-start-message" role="status"></p>
+                  <button type="button" class="secondary" id="landing-new">New game</button>
+                </div>
+                <div class="landing-cutscene" id="landing-cutscene">
+                  <div class="landing-cutscene-header">Babe &lt;3</div>
+                  <div class="chat landing-chat" id="landing-chat"></div>
+                  <button type="button" id="landing-cutscene-continue">Continue</button>
+                  <p class="landing-message" id="landing-cutscene-message" role="status"></p>
                 </div>
               </div>
             </div>
@@ -76,8 +82,16 @@
       const startMessage = document.getElementById("landing-start-message");
       const continueBtn = document.getElementById("landing-continue");
       const newBtn = document.getElementById("landing-new");
+      const headerPanel = document.getElementById("landing-header");
+      const cutscenePanel = document.getElementById("landing-cutscene");
+      const cutsceneLog = document.getElementById("landing-chat");
+      const cutsceneMessage = document.getElementById("landing-cutscene-message");
+      const cutsceneContinue = document.getElementById("landing-cutscene-continue");
       const SAVE_KEY = "meme-market-save";
       const START_MODE_KEY = "meme-market-start";
+      const INTRO_SEEN_KEY = "meme-market-intro-seen";
+      const ping = new Audio("/assets/notification.mp3");
+      ping.volume = 0.55;
 
       const showStartOptions = () => {
         form.classList.add("is-hidden");
@@ -94,7 +108,67 @@
       });
 
       newBtn.addEventListener("click", () => {
+        const shouldPlayIntro = !localStorage.getItem(INTRO_SEEN_KEY);
         sessionStorage.setItem(START_MODE_KEY, "new");
+        if (!shouldPlayIntro) {
+          window.location.href = "/game.html";
+          return;
+        }
+        playCutscene();
+      });
+
+      const playCutscene = () => {
+        form.classList.add("is-hidden");
+        startPanel.classList.remove("active");
+        cutscenePanel.classList.add("active");
+        headerPanel.classList.add("is-hidden");
+        cutsceneLog.innerHTML = "";
+        cutsceneMessage.textContent = "";
+        cutsceneContinue.disabled = true;
+        cutsceneContinue.classList.remove("active");
+
+        const messages = [
+          "Babe <3: listen, you're great... but you don't make enough money for me. this just isnt gonna work out.",
+          "You: wait no please ill do better its the job market no ones hiring vibecoders",
+          "Babe <3: i lied ur not that great. but, if ur broke ahh can make a 100 grand in 7 days i'll THINK about giving you another chance",
+          "You: what",
+          "Babe <3: you heard me. see u then",
+          "This contact has blocked you.",
+          "You: wait :(",
+        ];
+
+        const shouldPing = (text) =>
+          text.startsWith("Babe <3:") || text === "This contact has blocked you.";
+
+        const stepMs = 3300;
+        messages.forEach((text, index) => {
+          setTimeout(() => {
+            const div = document.createElement("div");
+            div.className = "msg";
+            div.textContent = text;
+            cutsceneLog.appendChild(div);
+            cutsceneLog.scrollTop = cutsceneLog.scrollHeight;
+            if (shouldPing(text)) {
+              try {
+                const sound = ping.cloneNode(true);
+                sound.volume = ping.volume;
+                sound.play();
+              } catch (error) {
+                // Ignore autoplay failures.
+              }
+            }
+          }, stepMs * index);
+        });
+
+        localStorage.setItem(INTRO_SEEN_KEY, "1");
+        setTimeout(() => {
+          cutsceneMessage.textContent = "time to win her back";
+          cutsceneContinue.disabled = false;
+          cutsceneContinue.classList.add("active");
+        }, stepMs * messages.length + 400);
+      };
+
+      cutsceneContinue.addEventListener("click", () => {
         window.location.href = "/game.html";
       });
 
@@ -130,6 +204,7 @@
 
           throw new Error("Invalid password");
         } catch (error) {
+          // showStartOptions();
           message.textContent = "Nope. Try again.";
           message.dataset.status = "error";
           form.classList.remove("shake");
