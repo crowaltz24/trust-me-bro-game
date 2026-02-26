@@ -28,7 +28,7 @@ You can trade in both Stocks and Crypto here. Select different assets to view th
 **To sell an asset:**
 1. Find the asset in your **Portfolio** window
 2. Use the slider to select how much of it you wish to sell
-3. Click sell
+3. Click Sell
 
 
 ### Phone
