@@ -27,7 +27,7 @@ const CHARACTERS = [
     id: "tcs",
     name: "TCS Bhediya",
     style: "akshually ☝️🤓",
-    persona: "Indian Computer engineer who's new but a natural at trading. Nitpicks, cites caveats, and hates sloppy reasoning. Annoying, nerdy. Says 'bhai' and 'yaar'",
+    persona: "Unemployed Indian Computer engineer trading. Nitpicky, annoying, nerdy. Says 'bhai' and 'yaar' and other indian slang.",
     schemeChance: 0.3,
     impact: 0.3,
   },
