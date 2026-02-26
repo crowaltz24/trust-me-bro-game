@@ -11,6 +11,8 @@
   --panel-strong: #0f172a;
   --border: #263241;
   --shadow: transparent;
+  --profit: #22c55e;
+  --loss: #ef4444;
 }
 
 * {
@@ -260,6 +262,30 @@ select {
   gap: 10px;
   font-family: "IBM Plex Mono", monospace;
   font-size: 0.85rem;
+}
+
+.portfolio-total {
+  display: grid;
+  text-align: right;
+  gap: 2px;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.portfolio-total strong {
+  font-size: 1rem;
+}
+
+.pnl-positive {
+  color: var(--profit);
+}
+
+.pnl-negative {
+  color: var(--loss);
+}
+
+.pnl-neutral {
+  color: var(--muted);
 }
 
 

@@ -31,6 +31,7 @@ const ui = {
   buyBtn: document.getElementById("buy-btn"),
   sellBtn: document.getElementById("sell-btn"),
   portfolioList: document.getElementById("portfolio-list"),
+  portfolioTotal: document.getElementById("portfolio-total"),
   phoneTabs: document.querySelectorAll(".phone-tab"),
   phonePanels: document.querySelectorAll(".phone-panel"),
   contactList: document.getElementById("contact-list"),
@@ -147,6 +148,12 @@ function renderPortfolio() {
   const existingRows = new Map(
     Array.from(ui.portfolioList.querySelectorAll(".row")).map((row) => [row.dataset.asset, row])
   );
+  const totalPnl = snapshots.reduce((sum, position) => sum + position.pnl, 0);
+  if (ui.portfolioTotal) {
+    const totalLabel = totalPnl >= 0 ? `+${formatMoney(totalPnl)}` : formatMoney(totalPnl);
+    ui.portfolioTotal.textContent = totalLabel;
+    applyPnlClass(ui.portfolioTotal, totalPnl);
+  }
   if (snapshots.length === 0) {
     ui.portfolioList.innerHTML = "";
     ui.portfolioList.textContent = "No positions yet.";
@@ -179,11 +186,27 @@ function renderPortfolio() {
     slider.value = String(Math.min(currentValue, position.amount));
     amountValue.textContent = slider.value;
     row.querySelector(".row-asset").textContent = `${position.id} (${position.amount})`;
-    row.querySelector(".row-pnl").textContent = pnl;
+    const pnlEl = row.querySelector(".row-pnl");
+    pnlEl.textContent = pnl;
+    applyPnlClass(pnlEl, position.pnl);
     existingRows.delete(position.id);
   });
 
   existingRows.forEach((row) => row.remove());
+}
+
+function applyPnlClass(element, value) {
+  if (!element) {
+    return;
+  }
+  element.classList.remove("pnl-positive", "pnl-negative", "pnl-neutral");
+  if (value > 0) {
+    element.classList.add("pnl-positive");
+  } else if (value < 0) {
+    element.classList.add("pnl-negative");
+  } else {
+    element.classList.add("pnl-neutral");
+  }
 }
 
 function ensureChat(contactId) {
