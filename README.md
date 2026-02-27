@@ -15,7 +15,7 @@ Built for Hawk-a-thoon '26. Currently password locked to limit API usage.
 
 ## Setup
 
-It's just vanilla JS. Load up `index.html` and you're good to go. That being said, the password API and the chat API won't work locally because we designed it for Vercel hosting.
+It's just vanilla JS. Load up `index.html` and you're good to go. That being said, the password API and the chat API won't work locally because we designed it for Vercel hosting. When deploying it yourself, make sure to set your OpenAI API key in the env variables, as well as the password.
 
 ## How to Play
 
