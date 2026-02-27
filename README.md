@@ -1,7 +1,9 @@
 # Trust Me Bro
 #### *play stupid games, win stupid prizes*
-Team: Bagholders
-Members: Abhay Tyagi 23BAI10001, Avish Sinha 23BAI10091
+
+**Team:** Bagholders
+
+**Members:** Abhay Tyagi 23BAI10001, Avish Sinha 23BAI10091
 
 ---
 
