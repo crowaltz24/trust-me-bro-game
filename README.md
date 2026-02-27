@@ -1,6 +1,10 @@
 # Trust Me Bro
 #### *play stupid games, win stupid prizes*
 
+**Team:** Bagholders
+
+**Members:** Abhay Tyagi 23BAI10001, Avish Sinha 23BAI10091
+
 ---
 
 **Trust Me Bro** is a (bad) stock market simulation game where no one is your friend.
@@ -8,6 +12,10 @@
 Your girlfriend just left you because you don't make enough money -- time to go for broke and win her back! Trade stocks and crypto, keep up with social media and news, and try to figure out if your contacts are giving you good advice or pulling a fast one on you. 
 
 Built for Hawk-a-thoon '26. Currently password locked to limit API usage.
+
+## Setup
+
+It's just vanilla JS. Load up `index.html` and you're good to go. That being said, the password API and the chat API won't work locally because we designed it for Vercel hosting.
 
 ## How to Play
 
